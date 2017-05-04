@@ -38,19 +38,19 @@ type Msg
 
 
 view : Model -> Html Msg
-view model =
+view { count, step } =
     div []
         [ div []
             [ button [ onClick DecrementCount ] [ text "-" ]
-            , text (toString model.count)
+            , text (toString count)
             , button [ onClick IncrementCount ] [ text "+" ]
             ]
         , div []
             [ button [ onClick DecrementStep ] [ text "-" ]
-            , text (toString model.step ++ "(steps)")
+            , text (toString step ++ "(steps)")
             , button [ onClick IncrementStep ] [ text "+" ]
             ]
-        , input [ type_ "number", value (toString model.step), onInput SetStep ] []
+        , input [ type_ "number", value (toString step), onInput SetStep ] []
         ]
 
 
@@ -59,26 +59,22 @@ view model =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    let
-        { count, step } =
-            model
-    in
-        case msg of
-            IncrementCount ->
-                ( { model | count = count + step }, Cmd.none )
+update msg ({ count, step } as model) =
+    case msg of
+        IncrementCount ->
+            ( { model | count = count + step }, Cmd.none )
 
-            DecrementCount ->
-                ( { model | count = count - step }, Cmd.none )
+        DecrementCount ->
+            ( { model | count = count - step }, Cmd.none )
 
-            IncrementStep ->
-                ( { model | step = step + 1 }, Cmd.none )
+        IncrementStep ->
+            ( { model | step = step + 1 }, Cmd.none )
 
-            DecrementStep ->
-                ( { model | step = step - 1 }, Cmd.none )
+        DecrementStep ->
+            ( { model | step = step - 1 }, Cmd.none )
 
-            SetStep value ->
-                ( { model | step = toInt value }, Cmd.none )
+        SetStep value ->
+            ( { model | step = toInt value }, Cmd.none )
 
 
 
@@ -87,8 +83,4 @@ update msg model =
 
 toInt : String -> Int
 toInt value =
-    let
-        initialStep =
-            initialModel.step
-    in
-        Result.withDefault initialStep (String.toInt value)
+    Result.withDefault initialModel.step (String.toInt value)

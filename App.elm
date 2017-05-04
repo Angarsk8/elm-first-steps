@@ -1,6 +1,6 @@
 module App exposing (..)
 
-import Html exposing (Html, div)
+import Html exposing (Html, div, program)
 import Counter
 import Widget
 
@@ -9,15 +9,15 @@ import Widget
 
 
 type alias Model =
-    { counterModel : Counter.Model
-    , widgetModel : Widget.Model
+    { counter : Counter.Model
+    , widget : Widget.Model
     }
 
 
 initialModel : Model
 initialModel =
-    { counterModel = Counter.initialModel
-    , widgetModel = Widget.initialModel
+    { counter = Counter.initialModel
+    , widget = Widget.initialModel
     }
 
 
@@ -35,10 +35,10 @@ type Msg
 
 
 view : Model -> Html Msg
-view model =
+view { counter, widget } =
     div []
-        [ Html.map CounterMsg (Counter.view model.counterModel)
-        , Html.map WidgetMsg (Widget.view model.widgetModel)
+        [ Html.map CounterMsg (Counter.view counter)
+        , Html.map WidgetMsg (Widget.view widget)
         ]
 
 
@@ -47,21 +47,21 @@ view model =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update msg ({ counter, widget } as model) =
     case msg of
         CounterMsg inner ->
             let
                 ( updatedCounter, cmd ) =
-                    Counter.update inner model.counterModel
+                    Counter.update inner counter
             in
-                ( { model | counterModel = updatedCounter }, Cmd.map CounterMsg cmd )
+                ( { model | counter = updatedCounter }, Cmd.map CounterMsg cmd )
 
         WidgetMsg inner ->
             let
                 ( updatedWidget, cmd ) =
-                    Widget.update inner model.widgetModel
+                    Widget.update inner widget
             in
-                ( { model | widgetModel = updatedWidget }, Cmd.map WidgetMsg cmd )
+                ( { model | widget = updatedWidget }, Cmd.map WidgetMsg cmd )
 
 
 
@@ -75,12 +75,11 @@ subscriptions model =
 
 
 -- APP
---uncomment if needed -- import Html.App as App
 
 
 main : Program Never Model Msg
 main =
-    Html.program
+    program
         { init = ( initialModel, Cmd.none )
         , view = view
         , update = update
